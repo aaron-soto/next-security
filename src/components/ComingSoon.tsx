@@ -53,9 +53,22 @@ CEO, C3 Security & Logistics
         toast({
           title: 'Success',
           description: 'Thank you for subscribing!',
-          variant: 'default', // or 'success' if your toast system has variants
+          variant: 'default',
         });
         setEmail('');
+
+        // Send notification to the sender email
+        await fetch('/api/send-email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            to: 'c3securitylogistics.com',
+            subject: 'New Signup Notification',
+            text: `A new user has signed up with the email: ${email}`,
+          }),
+        });
       } else {
         toast({
           title: 'Error',
