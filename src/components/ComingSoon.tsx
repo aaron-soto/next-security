@@ -64,7 +64,7 @@ CEO, C3 Security & Logistics
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            to: 'c3securitylogistics.com',
+            to: 'agents@c3securitylogistics.com',
             subject: 'New Signup Notification',
             text: `A new user has signed up with the email: ${email}`,
           }),
