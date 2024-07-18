@@ -1,7 +1,7 @@
 'use client';
 // components/ComingSoon.tsx
 import Image from 'next/image';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { useToast } from './ui/use-toast';
@@ -9,7 +9,16 @@ import { useToast } from './ui/use-toast';
 const ComingSoon = () => {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
+  const [hasSubmitted, setHasSubmitted] = useState(false);
   const { toast } = useToast();
+
+  useEffect(() => {
+    // Check if the form has been submitted before
+    const submitted = localStorage.getItem('hasSubmitted');
+    if (submitted) {
+      setHasSubmitted(true);
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,6 +66,10 @@ CEO, C3 Security & Logistics
         });
         setEmail('');
 
+        // Set the flag in localStorage to indicate form submission
+        localStorage.setItem('hasSubmitted', 'true');
+        setHasSubmitted(true);
+
         // Send notification to the sender email
         await fetch('/api/send-email', {
           method: 'POST',
@@ -88,7 +101,7 @@ CEO, C3 Security & Logistics
   };
 
   return (
-    <div className="flex flex-col justify-center items-center min-h-screen">
+    <div className="flex flex-col justify-center items-center view-fullscreen">
       <Image
         src="/images/C3Logo.jpeg"
         width={110}
@@ -102,44 +115,54 @@ CEO, C3 Security & Logistics
         We&apos;re working hard to bring you something amazing. Sign up below to
         be the first to know when we launch.
       </p>
-      <form onSubmit={handleSubmit} className="w-full max-w-sm">
-        <div className="flex sm:flex-row flex-col items-center gap-4 px-4 py-2">
-          <Input
-            type="email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            placeholder="Enter your email"
-            required
-            disabled={loading}
-          />
-          <Button type="submit" className="w-full sm:w-auto" disabled={loading}>
-            {loading ? (
-              <svg
-                className="w-5 h-5 text-white animate-spin"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                ></circle>
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                ></path>
-              </svg>
-            ) : (
-              'Notify Me'
-            )}
-          </Button>
-        </div>
-      </form>
+      {hasSubmitted ? (
+        <p className="text-center text-green-500">
+          You have already subscribed. Thank you!
+        </p>
+      ) : (
+        <form onSubmit={handleSubmit} className="w-full max-w-sm">
+          <div className="flex sm:flex-row flex-col items-center gap-4 px-4 py-2">
+            <Input
+              type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              placeholder="Enter your email"
+              required
+              disabled={loading}
+            />
+            <Button
+              type="submit"
+              className="w-full sm:w-auto"
+              disabled={loading}
+            >
+              {loading ? (
+                <svg
+                  className="w-5 h-5 text-white animate-spin"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+              ) : (
+                'Notify Me'
+              )}
+            </Button>
+          </div>
+        </form>
+      )}
     </div>
   );
 };
